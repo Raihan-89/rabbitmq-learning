@@ -31,12 +31,24 @@ public class StudentService implements StudentInterface {
     @Override
     public String saveStudent(StudentSaveDto studentDto) {
         try {
-            Student student = new Student(studentDto);
+            Student student = studentRepository.findByEmail(studentDto.getEmail());
+            if (student != null) {
+                return "Email is already registered";
+            }
+
+            student = studentRepository.findByPhoneNumber(studentDto.getPhoneNumber());
+
+            if (student != null) {
+                return "Phone number is already registered";
+            }
+
+            student = new Student(studentDto);
 
             studentRepository.save(student);
             log.info("Student saved successfully: {}", student);
         } catch (Exception e) {
             log.error("Failed to save student: {}", e.getMessage());
+            return "Failed to save student";
         }
 
         return "Student saved successfully.";
